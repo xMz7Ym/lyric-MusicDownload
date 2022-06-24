@@ -183,6 +183,30 @@ def _NameTo_ID(song_name):
     else :
         return music_info[1]["id"]
 
+def _nametomusic_down(song_name):
+    d = {"hlpretag": "<span class=\"s-fc7\">", "hlposttag": "</span>", "s": song_name, "type": "1", "offset": "0",
+         "total": "true", "limit": "30", "csrf_token": ""}
+    d = json.dumps(d)
+    random_param = get_random()
+    param = get_final_param(d, random_param)
+    song_list = get_music_list(param['params'], param['encSecKey'])
+    music_info = json.loads(song_list)['result']['songs']
+    for i in range(min(len(music_info),10)):
+        b = music_info[i]["ar"][0]["name"]
+        c = music_info[i]["name"]
+        print(f"{i+1}.{c}-{b}")
+    print("请输入您想下载的版本(输入序号)：")
+    try:
+        a = int(input())
+    except:
+        print("发生不可预料的错误，请检查您是否输入的为数字")
+        print("请输入您想下载的版本(输入序号)：")
+        a = int(input())
+    d = music_info[a-1]["ar"][0]["name"]
+    f = music_info[a-1]["name"]
+    _LyricDownload(music_info[a-1]["id"],f"{d}-{f}")
+    _MusicDownload(music_info[a-1]["id"],f"{d}-{f}")
+
 
 # 以下为功能的实现： 1.根据歌单下载所有歌单的所有歌曲AND歌曲
 def _DownList():
@@ -234,6 +258,14 @@ def _Downmusic():
     except:
         print("请仔细检查您输入的歌曲ID是否存在，已退出本系统")
 # _Downmusic() 测试成功
+
+#4.根据歌曲名称下载歌曲
+def _NameTomusic():
+    a = input("请输入您要下载的名字，搜索 歌名和作家名 成功搜到您想要的歌曲成功率更高哦~")
+    _nametomusic_down(a)
+
+#_NameTomusic() 测试成功
+print("本软件提供网易云音乐下载，歌词自动补全，下载歌单，下载歌曲等服务。")
 a = input("本软件仅供学习交流，如作他用所承受的法律责任一概与作者无关,下载者务必24小时内删除本软件\n您是否同意以上观点（Y/N）")
 
 if a not in ["y","Y","YES","yes","Yes","YEs","Yes"]:
@@ -243,7 +275,7 @@ if a not in ["y","Y","YES","yes","Yes","YEs","Yes"]:
     time.sleep(2)
 
 s = '''
-.----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------. 
+.----------------.  .----------------.  .----------------.  .----------------.  .----------------.  .----------------.
 | .--------------. || .--------------. || .--------------. || .--------------. || .--------------. || .--------------. |
 | |  ____  ____  | || | ____    ____ | || |   ________   | || |   _______    | || |  ____  ____  | || | ____    ____ | |
 | | |_  _||_  _| | || ||_   \  /   _|| || |  |  __   _|  | || |  |  ___  |   | || | |_  _||_  _| | || ||_   \  /   _|| |
@@ -253,17 +285,19 @@ s = '''
 | | |____||____| | || ||_____||_____|| || |  |________|  | || |    /_/       | || |   |______|   | || ||_____||_____|| |
 | |              | || |              | || |              | || |              | || |              | || |              | |
 | '--------------' || '--------------' || '--------------' || '--------------' || '--------------' || '--------------' |
-'----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------' 
+'----------------'  '----------------'  '----------------'  '----------------'  '----------------'  '----------------'
 '''
 print(s)
 print("如果喜欢本系统可以去 https://github.com/xMz7Ym/lyric-MusicDownload 点个start吗？？感谢不尽~")
+print("请确保电脑是否联网，是否已经生成Download文件夹。如果发生报错，闪退请上上述地址下载源码版本进行下载~~~（编译BUG多）")
 os.makedirs('./Download', exist_ok=True)
 while a in ["y","Y","YES","yes","Yes","YEs","Yes"]:
     print("本系统提供三种下载方式,请输入1,2,3来选择自己想要的模式，"
           "\n1.按照歌单ID下载歌曲和歌词,在网易云web端的网址栏查看，就是在歌单页面中最后那一串数字"
           "\n2.按照文件夹的已经存在的歌曲进行下载歌词"
           "\n3.按照歌曲ID下载歌曲和歌词,在网易云web端的网址栏查看，就是在歌曲页面中最后那一串数字"
-          "\n4.退出本系统\n")
+          "\n4.输入歌曲名字（或者一句歌词），根据检索提供您可能想下载的歌曲名字"
+          "\n5.退出本系统\n")
     YouSelect = input("您想进行哪种服务~？\n")
     if YouSelect == "1":
         _DownList()
@@ -287,6 +321,13 @@ while a in ["y","Y","YES","yes","Yes","YEs","Yes"]:
         else:
             break
     elif YouSelect == "4":
+        try:
+            _NameTomusic()
+        except:
+            print("请不要乱输入名字，不然我就报错了哦 ╭(╯^╰)╮")
+            _NameTomusic()
+
+    elif YouSelect == "5":
         print("已退出，感谢使用")
         time.sleep(3)
         break
